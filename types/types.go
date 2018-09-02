@@ -6,6 +6,7 @@ import (
 	"database/sql/driver"
 	"encoding/json"
 	"errors"
+	"fmt"
 
 	"io/ioutil"
 )
@@ -99,10 +100,14 @@ func (j *JSONText) Scan(src interface{}) error {
 		} else {
 			source = t
 		}
+	case JSONText:
+		*j = t
+	case *JSONText:
+		*j = *t
 	case nil:
 		*j = emptyJSON
 	default:
-		return errors.New("Incompatible type for JSONText")
+		return errors.New("Incompatible type for JSONText: " + fmt.Sprintf("%T", src))
 	}
 	*j = JSONText(append((*j)[0:0], source...))
 	return nil
